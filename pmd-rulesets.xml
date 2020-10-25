@@ -1,0 +1,184 @@
+<?xml version="1.0"?>
+
+<ruleset name="Custom ruleset"
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
+    <description>
+        The rulesets we want to use in pmd. For a detailed description of pmd rulesets:
+        http://pmd.sourceforge.net/rules/segmentNameIndex.html
+    </description>
+
+
+    <rule ref="rulesets/java/basic.xml"/>
+
+    <rule ref="rulesets/java/braces.xml"/>
+
+    <rule ref="rulesets/java/clone.xml"/>
+
+    <rule ref="rulesets/java/codesize.xml"/>
+    <rule ref="rulesets/java/codesize.xml/TooManyFields">
+        <properties>
+            <property name="violationSuppressXPath"
+                      value="//ClassOrInterfaceDeclaration//ImplementsList//ClassOrInterfaceType[@Image='BaseForm'] |
+                      //Annotation//Name[@Image='Entity']"/>
+        </properties>
+    </rule>
+    <rule ref="rulesets/java/controversial.xml">
+        <exclude name="AtLeastOneConstructor"/>
+        <exclude name="OnlyOneReturn"/>
+        <exclude name="AssignmentInOperand"/>
+    </rule>
+    <rule ref="rulesets/java/controversial.xml/DataflowAnomalyAnalysis">
+        <properties>
+            <property name="violationSuppressRegex" value="^Found 'UR'-anomaly.*"/>
+        </properties>
+    </rule>
+
+    <rule ref="rulesets/java/coupling.xml">
+        <exclude name="LawOfDemeter"/>
+        <exclude name="LoosePackageCoupling"/>
+    </rule>
+
+    <rule ref="rulesets/java/coupling.xml/ExcessiveImports">
+        <properties>
+            <property name="minimum"
+                      value="50"/>
+            <property name="violationSuppressXPath"
+                      value="//Annotation//Name[@Image='Entity']"/>
+        </properties>
+    </rule>
+
+    <rule ref="rulesets/java/design.xml">
+        <exclude name="AbstractClassWithoutAbstractMethod"/>
+        <exclude name="NonStaticInitializer"/>
+        <exclude name="UncommentedEmptyConstructor"/>
+        <exclude name="UncommentedEmptyMethodBody"/>
+        <exclude name="ConfusingTernary"/>
+    </rule>
+    <rule ref="rulesets/java/design.xml/SingularField">
+        <properties>
+            <property name="violationSuppressXPath"
+                      value="//Annotation/MarkerAnnotation//Name[@Image='Data'] |
+                             //Annotation/MarkerAnnotation//Name[@Image='Getter']"/>
+        </properties>
+    </rule>
+    <rule ref="rulesets/java/design.xml/ImmutableField">
+        <properties>
+            <property name="violationSuppressXPath"
+                      value="//Annotation/MarkerAnnotation//Name[@Image='Data'] |
+                             //Annotation/MarkerAnnotation//Name[@Image='Setter'] |
+                             //Annotation/MarkerAnnotation//Name[@Image='Autowired']"/>
+        </properties>
+    </rule>
+    <rule ref="rulesets/java/design.xml/CompareObjectsWithEquals">
+        <properties>
+            <property name="violationSuppressXPath"
+                      value="//MethodDeclarator[@Image='equals']"/>
+        </properties>
+    </rule>
+
+    <rule ref="rulesets/java/empty.xml"/>
+
+    <rule ref="rulesets/java/finalizers.xml"/>
+
+    <rule ref="rulesets/java/imports.xml/DuplicateImports">
+        <priority>5</priority>
+    </rule>
+    <rule ref="rulesets/java/imports.xml/DontImportJavaLang">
+        <priority>5</priority>
+    </rule>
+    <rule ref="rulesets/java/imports.xml/UnusedImports">
+        <priority>5</priority>
+    </rule>
+    <rule ref="rulesets/java/imports.xml/ImportFromSamePackage">
+        <priority>5</priority>
+    </rule>
+    <rule ref="rulesets/java/imports.xml/TooManyStaticImports">
+        <properties>
+            <property name="maximumStaticImports"
+                      value="10"/>
+        </properties>
+    </rule>
+    <rule ref="rulesets/java/j2ee.xml"/>
+
+    <rule ref="rulesets/java/javabeans.xml"/>
+    <rule ref="rulesets/java/javabeans.xml/BeanMembersShouldSerialize">
+        <properties>
+            <property name="violationSuppressXPath"
+                      value="//Annotation/MarkerAnnotation//Name[@Image='Autowired'] |
+                             //Annotation/MarkerAnnotation//Name[@Image='PersistenceContext'] |
+                             //Annotation//Name[@Image='Value'] |
+                             //Annotation//Name[@Image='ConverterDefinition'] |
+                             //ClassOrInterfaceDeclaration//ImplementsList//ClassOrInterfaceType[@Image='ConstraintValidator'] |
+                             //Annotation/MarkerAnnotation//Name[@Image='Getter'] |
+                             //Annotation/MarkerAnnotation//Name[@Image='Data']"/>
+        </properties>
+    </rule>
+
+    <rule ref="rulesets/java/junit.xml"/>
+
+    <rule ref="rulesets/java/migrating.xml"/>
+
+    <rule ref="rulesets/java/naming.xml">
+        <exclude name="GenericsNaming"/>
+        <exclude name="AbstractNaming"/>
+    </rule>
+    <rule ref="rulesets/java/naming.xml/LongVariable">
+        <properties>
+            <property name="minimum"
+                      value="50"/>
+        </properties>
+    </rule>
+    <rule ref="rulesets/java/naming.xml/MethodNamingConventions"/>
+    <rule ref="rulesets/java/naming.xml/ShortVariable">
+        <properties>
+            <property name="minimum"
+                      value="2"/>
+        </properties>
+    </rule>
+    <rule ref="rulesets/java/naming.xml/ShortClassName">
+        <properties>
+            <property name="minimum"
+                      value="4"/>
+        </properties>
+    </rule>
+
+    <rule ref="rulesets/java/optimizations.xml">
+        <exclude name="LocalVariableCouldBeFinal"/>
+        <exclude name="AvoidInstantiatingObjectsInLoops"/>
+        <exclude name="MethodArgumentCouldBeFinal"/>
+    </rule>
+
+    <rule ref="rulesets/java/strictexception.xml"/>
+    <rule ref="rulesets/java/strictexception.xml/SignatureDeclareThrowsException">
+        <properties>
+            <property name="violationSuppressXPath"
+                      value="//Annotation/MarkerAnnotation//Name[@Image='Override']"/>
+        </properties>
+    </rule>
+
+    <rule ref="rulesets/java/strings.xml"/>
+
+    <rule ref="rulesets/java/sunsecure.xml"/>
+
+    <rule ref="rulesets/java/typeresolution.xml"/>
+
+
+    <rule ref="rulesets/java/unusedcode.xml"/>
+    <rule ref="rulesets/java/unusedcode.xml/UnusedPrivateField">
+        <properties>
+            <property name="violationSuppressXPath"
+                      value="//Annotation/MarkerAnnotation//Name[@Image='Data'] |
+                             //Annotation/MarkerAnnotation//Name[@Image='Getter'] |
+                             //Annotation/MarkerAnnotation//Name[@Image='Setter']"/>
+        </properties>
+    </rule>
+    <rule ref="rulesets/java/unusedcode.xml/UnusedPrivateMethod">
+        <properties>
+            <property name="violationSuppressXPath"
+                      value="//Annotation/MarkerAnnotation//Name[@Image='PostConstruct'] |
+                             //Annotation/MarkerAnnotation//Name[@Image='ModelAttribute']"/>
+        </properties>
+    </rule>
+</ruleset>

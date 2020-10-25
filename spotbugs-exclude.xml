@@ -1,0 +1,45 @@
+<FindBugsFilter>
+    <Match>
+        <Class name="~.*\.*MapperImpl"/>
+        <Or>
+            <Bug pattern="BX_BOXING_IMMEDIATELY_UNBOXED"/>
+            <Bug pattern="DM_BOOLEAN_CTOR"/>
+            <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/>
+        </Or>
+    </Match>
+    <Match>
+        <Class name="~.*\.*_"/>
+        <Bug pattern="UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD"/>
+    </Match>
+    <Match>
+        <Class name="~.*\.*"/>
+        <Bug pattern="EI_EXPOSE_REP"/>
+    </Match>
+    <Match>
+        <Class name="~.*\.*"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="~.*\.SpringEnvironment"/>
+        <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+    </Match>
+    <Match>
+        <Class name="~.*\.CoreWebAutoConfiguration"/>
+        <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"/>
+    </Match>
+    <Match>
+        <Class name="~.*\.EnumIn"/>
+        <Bug pattern="EC_UNRELATED_TYPES_USING_POINTER_EQUALITY"/>
+    </Match>
+    <Match>
+        <Class name="~.*\.DomainEntity"/>
+        <Or>
+            <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"/>
+            <Bug pattern="BC_EQUALS_METHOD_SHOULD_WORK_FOR_ALL_OBJECTS"/>
+        </Or>
+    </Match>
+    <Match>
+        <Source name="~.*\.groovy"/>
+        <Bug pattern="SE_NO_SERIALVERSIONID"/>
+    </Match>
+</FindBugsFilter>

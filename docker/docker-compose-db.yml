@@ -1,0 +1,22 @@
+version: '3'
+networks:
+    taskmanager-net:
+services:
+    taskmanager-database:
+        container_name: taskmanager-database
+        image: postgres:11.1-alpine
+        build: db
+        restart: on-failure:3
+        command: postgres -c config_file=/etc/postgresql/postgresql.conf
+        networks:
+            - taskmanager-net
+        volumes:
+            - taskmanager-database:/var/lib/postgresql/data
+        environment:
+            - POSTGRES_PASSWORD=postgres
+            - POSTGRES_USER=postgres
+            - POSTGRES_DB=taskmanager
+        ports:
+            - 5433:5432
+volumes:
+    taskmanager-database:

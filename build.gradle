@@ -1,0 +1,220 @@
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
+
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath "org.hibernate:hibernate-gradle-plugin:5.2.17.Final"
+    }
+}
+
+plugins {
+    id "net.ltgt.apt" version "0.19"
+    id "net.ltgt.apt-idea" version "0.18"
+    id "com.github.spotbugs" version "1.6.6"
+    id 'org.springframework.boot' version "2.1.2.RELEASE"
+    id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+    id 'com.palantir.git-version' version '0.12.0-rc2'
+}
+
+wrapper {
+    gradleVersion = '4.10.3'
+    distributionType = Wrapper.DistributionType.ALL
+}
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+def gitVersionDetails = versionDetails()
+def formattedBranchName = (gitVersionDetails.branchName?.replaceAll('/', '-')) ?: 'undefined'
+
+def buildNumber = System.getenv("BUILD_NUMBER")
+
+if (buildNumber) {
+    version = "${version.toString().replaceAll('SNAPSHOT', '')}build${buildNumber}"
+}
+
+new File("${rootProject.projectDir}/version.txt").text = "projectFinalVersion=${formattedBranchName}-${project.version}${System.lineSeparator()}\
+projectGitRevision=${gitVersionDetails.gitHashFull}"
+
+project.tasks.getByName("bootJar").enabled = false
+
+allprojects { project ->
+
+    group 'com.taskmanager'
+
+    if (project.hasProperty("buildNumber")) {
+        version = "${version.toString().replaceAll('SNAPSHOT', '')}build${project.findProperty("buildNumber")}"
+    }
+
+    repositories {
+        mavenCentral()
+        jcenter()
+        maven { url "https://plugins.gradle.org/m2/" }
+        maven { url "http://repo.spring.io/milestone" }
+        maven { url "http://repo.spring.io/plugins-release" }
+        maven { url "https://artifactory.hiendsys.ru/libs" }
+    }
+
+    apply plugin: 'java'
+    apply plugin: 'groovy'
+    apply plugin: 'net.ltgt.apt-idea'
+
+    sourceCompatibility = 1.11
+    targetCompatibility = 1.11
+
+    compileJava.dependsOn(processResources)
+    compileJava.options.encoding = 'UTF-8'
+
+    jar {
+        doFirst {
+            manifest {
+                attributes("Implementation-Version": project.version)
+            }
+        }
+    }
+
+    compileJava {
+        options.fork = true
+    }
+
+    task copySpringConfigurationMetadata(type: Copy) {
+        from file("$buildDir/classes/java/main/META-INF/spring-configuration-metadata.json")
+        into file('src/main/resources/META-INF/')
+    }
+
+    compileJava.finalizedBy copySpringConfigurationMetadata
+
+    jar {
+        doFirst {
+            manifest {
+                attributes("Implementation-Version": version)
+            }
+        }
+    }
+
+    test {
+        failFast = true
+        //maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+    }
+
+    apply plugin: 'io.spring.dependency-management'
+
+    dependencyManagement {
+        imports {
+            mavenBom SpringBootPlugin.BOM_COORDINATES
+
+        }
+        dependencies {
+            dependency("com.google.guava:guava:$guavaVersion")
+        }
+    }
+
+    dependencies {
+        compile("org.apache.httpcomponents:httpclient:${httpClientVersion}")
+        compile("javax.xml.bind:jaxb-api:${jaxbApiVersion}")
+        compile("com.sun.xml.bind:jaxb-core:${jaxbCoreVersion}")
+        compile("com.sun.xml.bind:jaxb-impl:${jaxbImplVersion}")
+
+        compile('com.google.guava:guava')
+        compile("org.slf4j:jcl-over-slf4j:$jclOverSlf4jVersion")
+        compile("ch.qos.logback:logback-classic:$logbackClassicVersion")
+        compile("commons-io:commons-io:$commonsIOVersion")
+        compile("commons-codec:commons-codec:$commonsCodecVersion")
+        compile("org.apache.commons:commons-lang3:$commonsLangVersion")
+        compile("commons-beanutils:commons-beanutils:$commonsBeanUtilsVersion")
+        compile("commons-collections:commons-collections:$commonsCollectionsVersion")
+        compile("org.hibernate.validator:hibernate-validator:$hibernateValidatorVersion")
+        compile('org.springframework:spring-context-support')
+        compile('org.springframework.boot:spring-boot-starter')
+        compile("org.springframework.boot:spring-boot-devtools")
+        compile('org.springframework.boot:spring-boot-autoconfigure')
+        compile("org.mapstruct:mapstruct-jdk8:${mapStructVersion}")
+        compile("org.projectlombok:lombok:${lombokVersion}")
+        compile("org.codehaus.groovy:groovy-all:${groovyVersion}")
+
+        //Only for developing issue
+        compile("io.github.benas:random-beans:${randomBeansVersion}")
+
+        testCompile("junit:junit")
+        testCompile "org.spockframework:spock-spring:${spockVersion}"
+        testCompile("org.assertj:assertj-core")
+        //testCompile("com.github.javafaker:javafaker:${javaFakerVersion}")
+        //testCompile("io.github.benas:random-beans-validation:${randomBeansVersion}")
+
+        annotationProcessor "org.mapstruct:mapstruct-processor:${mapStructVersion}", "org.projectlombok:lombok:${lombokVersion}",
+            "org.springframework.boot:spring-boot-configuration-processor", 'com.querydsl:querydsl-apt'
+    }
+
+    //enable hibernate bytecode enhancer to get basic property lazy-loading feature (for jsonb fo ex)
+    apply plugin: 'org.hibernate.orm'
+
+    hibernate {
+        enhance {
+            enableLazyInitialization = true
+            //enableDirtyTracking = true
+            //enableAssociationManagement = true
+        }
+    }
+
+    clean {
+        delete "out"
+        delete "target"
+        delete "build"
+    }
+
+    idea {
+        module {
+            apt {
+                // whether generated sources dirs are added as generated sources root
+                addGeneratedSourcesDirs = true
+                // whether the apt and testApt dependencies are added as module dependencies
+                addAptDependencies = true
+
+                // The following are mostly internal details; you shouldn't ever need to configure them.
+                // whether the compileOnly and testCompileOnly dependencies are added as module dependencies
+                addCompileOnlyDependencies = false // defaults to true in Gradle < 2.12
+                // the dependency scope used for apt and/or compileOnly dependencies (when enabled above)
+                mainDependenciesScope = "PROVIDED"
+                // defaults to "COMPILE" in Gradle < 3.4, or when using the Gradle integration in IntelliJ IDEA
+            }
+        }
+    }
+
+    apply plugin: 'checkstyle'
+    checkstyle {
+        configFile = file("${rootProject.projectDir}/checkstyle.xml")
+        sourceSets = [sourceSets.main]
+    }
+
+    tasks.withType(Checkstyle) {
+        //exclude excludedPackagesFromChecks
+    }
+
+    apply plugin: "com.github.spotbugs"
+    spotbugs {
+        excludeFilter = file("${rootProject.projectDir}/spotbugs-exclude.xml")
+        sourceSets = [sourceSets.main]
+    }
+
+    apply plugin: "pmd"
+    pmd {
+        ruleSetFiles = files("${rootProject.projectDir}/pmd-rulesets.xml")
+        toolVersion = '5.7.0'
+        sourceSets = [sourceSets.main]
+    }
+
+    tasks.withType(Pmd) {
+        //exclude excludedPackagesFromChecks
+    }
+
+    [checkstyleMain, checkstyleTest, spotbugsMain, spotbugsTest, pmdMain, pmdTest].each {
+        it.enabled = !(Boolean.getBoolean('skipChecks') || Boolean.getBoolean('skipAll'))
+    }
+    test.enabled = !(Boolean.getBoolean('skipTests') || Boolean.getBoolean('skipAll'))
+
+}

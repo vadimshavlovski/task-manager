@@ -1,0 +1,18 @@
+dependencies {
+    compile project(':taskmanager-core:taskmanager-core-web')
+
+    runtime('org.flywaydb:flyway-core')
+}
+
+def artifactName = 'taskmanager'
+
+apply plugin: 'org.springframework.boot'
+bootJar {
+    baseName = artifactName
+    mainClassName = "com.taskmanager.application.TaskManagerApplication"
+    excludeDevtools = project.hasProperty("prod")
+}
+
+springBoot {
+    buildInfo()
+}

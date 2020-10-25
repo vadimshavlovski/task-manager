@@ -1,0 +1,59 @@
+server:
+    port: 8080
+    servlet:
+        context-path: /taskmanager
+        session:
+            timeout: 1800
+            persistent: false
+    tomcat:
+        uri-encoding: UTF-8
+    error:
+        include-stacktrace: always
+spring:
+    application:
+        name: Task Manager Application
+    datasource:
+        url: jdbc:postgresql://localhost:5432/taskmanager
+        username: postgres
+        password: postgres
+        type: com.zaxxer.hikari.HikariDataSource
+        hikari:
+            leak-detection-threshold: 10000
+            connection-timeout: 500
+            connection-test-query: SELECT 1
+    jpa:
+        properties:
+            #javax.persistence.schema-generation:
+            #create-source: metadata
+            #scripts.action: create
+            #scripts.create-target: data/schema-ddl.sql
+            hibernate:
+                dialect: org.hibernate.dialect.PostgreSQL9Dialect
+                id:
+                    new_generator_mappings: true
+                jdbc:
+                    lob.non_contextual_creation: true
+                    batch_size: 25
+                    batch_versioned_data: true
+                    time_zone: UTC
+                order_updates: true
+                order_inserts: true
+                discriminator.ignore_explicit_for_joined: true
+                globally_quoted_identifiers: true
+        hibernate:
+            ddl-auto: validate
+        show-sql: false
+        generate-ddl: false
+        open-in-view: false
+    flyway:
+        enabled: true
+        out-of-order: true
+        baseline-on-migrate: true
+        placeholder-prefix: "__${"
+        placeholder-suffix: "}__"
+        ignore-missing-migrations: true
+        validate-on-migrate: true
+taskmanager:
+    core:
+
+

@@ -1,0 +1,12 @@
+dependencies {
+    compile("org.postgresql:postgresql:${postgreSqlVersion}")
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-starter-thymeleaf')
+//    compile('org.springframework.security:spring-security-core')
+    compile ('com.fasterxml.jackson.datatype:jackson-datatype-jsr310')
+    compile("org.zalando:problem-spring-web:${problemSpringWebVersion}")
+    compile('org.springframework.boot:spring-boot-starter-data-jpa')
+    compile("com.vladmihalcea:hibernate-types-52:${hibernate52TypesVersion}")
+    compile("org.reflections:reflections:${reflectionsVersion}")
+
+}
